@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LibraryShop\LibraryShop.csproj" />
+    <ProjectReference Include="..\EndingsOfTheNouns\EndingsOfTheNouns.csproj" />
+    <ProjectReference Include="..\Shop.BLL\Shop.BLL.csproj" />
+    <ProjectReference Include="..\Shop.DAL\Shop.DAL.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,6 @@
-﻿namespace LibraryShop.Expenses
+﻿using Shop.BLL.Expenses;
+
+namespace Shop.BLL.Expenses
 {
     public class TotalExpenses
     {

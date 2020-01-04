@@ -1,17 +1,14 @@
-﻿using LibraryShop.RentalSpace;
-using LibraryShop.Staff;
+﻿using Shop.DAL.Storages;
 
-namespace LibraryShop.Expenses
+namespace Shop.BLL.Expenses
 {
     public class TotalConstExpenses
     {
-        private readonly IEmployee[] employees;
-        private readonly IRentalSpace[] rentalSpaces;
+        private readonly Storage storage;
 
-        public TotalConstExpenses(IEmployee[] employees, params IRentalSpace[] rentalSpaces)
+        public TotalConstExpenses()
         {
-            this.employees = employees;
-            this.rentalSpaces = rentalSpaces;
+            storage = Storage.GetStorages();
 
 
             RentalSpaseExpenses = GetTotalExpensesForRentalSpace();
@@ -26,7 +23,7 @@ namespace LibraryShop.Expenses
         private decimal GetTotalExpensesForEmployees()
         {
             decimal expensesForEmployee = 0;
-            foreach (var employee in employees)
+            foreach (var employee in storage.Employees)
             {
                 expensesForEmployee += employee.Salary;
             }
@@ -37,10 +34,11 @@ namespace LibraryShop.Expenses
         private decimal GetTotalExpensesForRentalSpace()
         {
             decimal expensesForRentalSpace = 0;
-            foreach (var space in rentalSpaces)
+            foreach (var space in storage.RentalSpaces)
             {
                 expensesForRentalSpace += space.Rental;
             }
+
             return expensesForRentalSpace;
         }
     }

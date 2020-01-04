@@ -1,4 +1,6 @@
 ﻿using System;
+using Shop.DAL.Infrastructure;
+using EndingsOfTheNouns;
 
 namespace Shop
 {
@@ -6,97 +8,46 @@ namespace Shop
     {
         static void Main()
         {
-            MyShop myShop = new MyShop();
-            var tableExpenses = new ConsoleTable("Аренда", "Зарплата", "Закупка", "Итого");
+            decimal delta;
+            decimal revenue;
+            int counter = 1;
+            var tableExpenses = new ConsoleTable("№","Аренда", "Зарплата", "Закупка", "Итого");
             var tableRevenueFromSales = new ConsoleTable("№", "Цена продажи","Наценка", "Количество", "Итого с продаж");
 
-            decimal purchaseToy;
-            decimal salesToy;
-            decimal surcharge;
-            decimal totalRevenue;
-            int count;
-
-            Console.WriteLine("Введите свой бюджет.");
-            myShop.Budget = myShop.VerificationOfData();    
-            
             try
             {
-                Console.WriteLine("Введите арендную плату.");
-                myShop.ValueRentalSpace = myShop.VerificationOfData();
-                myShop.Budget -= myShop.ValueRentalSpace;
-                if (myShop.Budget <= 0)
+                var input = new MyShopInputData();
+                var myShop = new MyShopOutpurResult(input);
+
+                delta = myShop.Delta.DeltaFromShop;
+                revenue = myShop.Revenue.GetRevenue();
+
+                if (input.NumberOfMonths == 1)
                 {
-                    throw new Exception();
+                    tableExpenses.AddRow("1",myShop.TotalConst.GetTotalExpensesForRentalSpace().ToString(),
+                                         myShop.TotalConst.GetTotalExpensesForEmployees().ToString(),
+                                         myShop.TotalVariable.GetTotalExpensesForGoods().ToString(),
+                                         myShop.TotalExpenses.GetExpenses().ToString()); 
                 }
-                myShop.CreateRentalSpace();
-
-                Console.WriteLine("Введите зарплату бухгалтеру.");
-
-                myShop.SalaryForAccountant = myShop.VerificationOfData();
-                myShop.Budget -= myShop.SalaryForAccountant;
-                if (myShop.Budget <= 0)
-                {
-                    throw new Exception();
-                }
-
-                Console.WriteLine("Введите зарплату продавцу.");
-
-                myShop.SalaryForSeller = myShop.VerificationOfData();
-                myShop.Budget -= myShop.SalaryForSeller;
-                if (myShop.Budget <= 0)
-                {
-                    throw new Exception();
-                }
-
-                Console.WriteLine("Введите зарплату грузчику.");
-
-                myShop.SalaryForPorter = myShop.VerificationOfData();
-                myShop.Budget -= myShop.SalaryForPorter;
-                if (myShop.Budget <= 0)
-                {
-                    throw new Exception();
+                else 
+                { 
+                    foreach (var expense in myShop.Expenses) 
+                    {
+                        tableExpenses.AddRow(counter.ToString(),
+                                             expense.TotalRentalSpace.ToString(),
+                                             expense.TotalSalary.ToString(),
+                                             expense.TotalPurchasePriceOfGood.ToString(),
+                                             expense.TotalExpenses.ToString());
+                        ++counter;
+                    }
                 }
 
-                Console.WriteLine("Введите зарплату закупщику.");
-
-                myShop.SalaryForPurchasingAgent = myShop.VerificationOfData();
-                myShop.Budget -= myShop.SalaryForPurchasingAgent;
-                if (myShop.Budget <= 0)
+                counter = 1;
+                foreach (var good in (input.NumberOfMonths == 1 ? myShop.GetGoods() : myShop.Toys))
                 {
-                    throw new Exception();
-                }
-
-                myShop.AddStaff();
-
-                Console.WriteLine("Введите закупочную цену игрушки.");
-                myShop.PricePurchaseToy = myShop.VerificationOfData();
-                if (myShop.Budget >= myShop.PricePurchaseToy)
-                {
-                    myShop.NumberOfToys = (int)Math.Floor(myShop.Budget / myShop.PricePurchaseToy);
-                    Console.WriteLine("На оставшиеся деньги можно купить {0} игрушек.", myShop.NumberOfToys);
-
-                    myShop.Budget -= myShop.PricePurchaseToy * myShop.NumberOfToys;
-                }
-
-                Console.WriteLine("Введите цену при продажи игрушки.");
-                myShop.PriceSalesToy = myShop.VerificationOfData();
-
-                myShop.CreateGoods();
-
-                purchaseToy = myShop.GetGoods().PurchasePrice;
-                count = myShop.GetGoods().Count;
-                salesToy = myShop.GetGoods().SalePrice;
-                surcharge = salesToy - purchaseToy;
-                totalRevenue = salesToy * count;
-
-                myShop.CreateExpenses();
-
-                tableExpenses.AddRow(myShop.GetTotalConstExpenses().RentalSpaseExpenses.ToString(),
-                                     myShop.GetTotalConstExpenses().EmployeesExpenses.ToString(),
-                                     myShop.GetTotalVariableExpenses().VariableExpenses.ToString(),
-                                     myShop.GetTotalExpenses().Expenses.ToString());
-
-                tableRevenueFromSales.AddRow("1", salesToy.ToString(), surcharge.ToString(), count.ToString(), totalRevenue.ToString());
+                    tableRevenueFromSales.AddRow(counter.ToString(), good.SalePrice.ToString(), good.Margin.ToString(), good.Count.ToString(), good.TotalRevenueFromSales.ToString());
+                    ++counter;
+                }              
 
                 Console.WriteLine("Затраты");
                 tableExpenses.Print();
@@ -104,12 +55,20 @@ namespace Shop
                 Console.WriteLine("Доход от продажи товара");
                 tableRevenueFromSales.Print();
 
-                myShop.CreateDelta(1);
-                Console.WriteLine(" Дельта за один месяц: {0}.", myShop.GetDelta().DeltaFromShop);
+                Console.WriteLine($"Доход за {input.NumberOfMonths} {Endings.GetNewWord("месяц", input.NumberOfMonths)}: {revenue}.");
+                Console.WriteLine("Прибыль за это время составила:{0}", delta);
             }
-            catch
-            {                
-                Console.WriteLine("No money");
+            catch (InvalidCastException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (MoneyException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
 
             Console.ReadLine();
