@@ -3,6 +3,7 @@ using Shop.DAL.Models;
 using Shop.DAL.Repositories;
 using Shop.DAL.Revenue;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Shop.DAL
 {
@@ -11,9 +12,17 @@ namespace Shop.DAL
         private readonly ListUnitOfWorks storages;
         private readonly List<Goods> goods;
         private readonly List<Analytics.Expenses> expenses;
+        private readonly List<decimal> result = new List<decimal>();
 
-        private decimal delta = 0;
-        private int numbersOfToys = 0;
+        private readonly decimal totalConstExpenses;
+        
+        private decimal balance;        
+        private decimal surplus;
+
+        private decimal margin;
+        private decimal totalRevenueFromSales;
+        private decimal totalExpenceForPurchase;
+        private int numbersOfToys;
 
         public Delta(TotalExpenses total, RevenueFromSales revenueFromSales)//const number of toys every month
         { 
@@ -25,22 +34,34 @@ namespace Shop.DAL
             this.goods = goods;
             this.expenses = expenses;
             storages = new ListUnitOfWorks();
+            
+            totalConstExpenses = totalConst.GetTotalExpensesForEmployees() + totalConst.GetTotalExpensesForRentalSpace();
 
-            decimal totalConstExpenses = totalConst.GetTotalExpensesForEmployees() + totalConst.GetTotalExpensesForRentalSpace();
-
-            DeltaFromShop = GetDelta(budget, totalConst, good, numberOfMonth) - goods[0].TotalExpensesForPurchase - totalConstExpenses;                  
+            DeltaFromShop =GetDelta(budget, totalConst, good, numberOfMonth) - goods.Sum(g=>g.TotalExpensesForPurchase) - totalConstExpenses * numberOfMonth;                  
         }       
 
         public decimal DeltaFromShop { get; }
 
         private decimal GetDelta(decimal budget, TotalConstExpenses totalConst, Goods good, int numberOfMonth)//variable number of toys every month
         {
-            numbersOfToys = (int)((budget - totalConst.GetTotalExpensesForEmployees() - totalConst.GetTotalExpensesForRentalSpace()) / good.PurchasePrice);
-            if (numberOfMonth >= 1)
+           if (numberOfMonth >= 1)
             {
-                delta = numbersOfToys * good.SalePrice;
+                balance = budget - totalConst.GetTotalExpensesForEmployees() - totalConst.GetTotalExpensesForRentalSpace();
+                numbersOfToys = (int)(balance / good.PurchasePrice);
+                surplus = balance - numbersOfToys * good.PurchasePrice;
+               
+                margin = good.SalePrice - good.PurchasePrice;
+                totalRevenueFromSales = good.SalePrice * numbersOfToys;
+                totalExpenceForPurchase = good.PurchasePrice * numbersOfToys;
+                result.Add(totalRevenueFromSales);
 
-                var newGood = new Goods(good.PurchasePrice, good.SalePrice, numbersOfToys);
+                var newGood = new Goods {PurchasePrice = good.PurchasePrice,
+                                         SalePrice = good.SalePrice, 
+                                         Count = numbersOfToys,
+                                         Margin = margin,
+                                         TotalExpensesForPurchase = totalExpenceForPurchase,
+                                         TotalRevenueFromSales = totalRevenueFromSales};                
+
                 goods.Add(newGood);
                 storages.Goods.Update(newGood, 0);
 
@@ -49,11 +70,11 @@ namespace Shop.DAL
                     totalConst.GetTotalExpensesForEmployees(),
                     newGood.PurchasePrice * newGood.Count));
 
-                return GetDelta(delta, totalConst, good, numberOfMonth - 1);
+                return GetDelta(totalRevenueFromSales + surplus, totalConst, good, numberOfMonth - 1);
             }
             else
             {
-                return delta;  
+                return result.Sum();  
             } 
         }
     }

@@ -3,16 +3,14 @@
     public class Employees
     {
         private static int id = 1;
-        public Employees(string position, decimal salary)
+        public Employees()
         {
             Id = id;
-            Position = position;
-            Salary = salary;
             ++id;
         }
 
-        public int Id { get; private set; }
-        public string Position { get; private set; }
-        public decimal Salary { get; private set; }
+        public int Id { get; set; }
+        public string Position { get;  set; }
+        public decimal Salary { get;  set; }
     }
 }

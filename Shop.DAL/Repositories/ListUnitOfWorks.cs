@@ -5,9 +5,9 @@ namespace Shop.DAL.Repositories
 {
     public class ListUnitOfWorks : IUnitOfWork
     {
-        private RepositoryOfEmployees employees;
-        private RepositoryOfGoods goods;
-        private RepositoryOfRentalSpace rentalSpace;
+        private IRepository<Employees> employees;
+        private IRepository<Goods> goods;
+        private IRepository<RentalSpaces> rentalSpace;
 
         
         public IRepository<Employees> Employees

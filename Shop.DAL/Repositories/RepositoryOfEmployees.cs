@@ -1,7 +1,6 @@
 ﻿using Shop.DAL.Models;
 using Shop.DAL.Interfaces;
 using Shop.DAL.Storages;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,12 +37,12 @@ namespace Shop.DAL.Repositories
 
         public void Update(Employees item, int id)
         {
-            throw new NotImplementedException();
+            storages.Employees[id] = item;
         }
 
-        public IEnumerable<Employees> Find(Func<Employees, bool> predicate)
+        public void Clear()
         {
-            throw new NotImplementedException();
+            storages.ClearEmployee();
         }
     }
 }

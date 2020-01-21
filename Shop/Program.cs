@@ -1,6 +1,8 @@
 ﻿using System;
-using Shop.DAL.Infrastructure;
-using EndingsOfTheNouns;
+using Shop.CursoreConsole;
+using Shop.PL;
+using Shop.Settings;
+using Exceptions;
 
 namespace Shop
 {
@@ -8,67 +10,91 @@ namespace Shop
     {
         static void Main()
         {
-            decimal delta;
-            decimal revenue;
-            int counter = 1;
-            var tableExpenses = new ConsoleTable("№","Аренда", "Зарплата", "Закупка", "Итого");
-            var tableRevenueFromSales = new ConsoleTable("№", "Цена продажи","Наценка", "Количество", "Итого с продаж");
+            Account account = new Account();
+            SignInOut signInOut = new SignInOut(account);
+            CalculaterOfRevenue calculater = new CalculaterOfRevenue(account);
 
             try
             {
-                var input = new MyShopInputData();
-                var myShop = new MyShopOutpurResult(input);
-
-                delta = myShop.Delta.DeltaFromShop;
-                revenue = myShop.Revenue.GetRevenue();
-
-                if (input.NumberOfMonths == 1)
+                ChoiseOperationForCalculateRevevenue mainScreen = new ChoiseOperationForCalculateRevevenue(calculater, signInOut);
+                while(true)
                 {
-                    tableExpenses.AddRow("1",myShop.TotalConst.GetTotalExpensesForRentalSpace().ToString(),
-                                         myShop.TotalConst.GetTotalExpensesForEmployees().ToString(),
-                                         myShop.TotalVariable.GetTotalExpensesForGoods().ToString(),
-                                         myShop.TotalExpenses.GetExpenses().ToString()); 
-                }
-                else 
-                { 
-                    foreach (var expense in myShop.Expenses) 
+                    try
                     {
-                        tableExpenses.AddRow(counter.ToString(),
-                                             expense.TotalRentalSpace.ToString(),
-                                             expense.TotalSalary.ToString(),
-                                             expense.TotalPurchasePriceOfGood.ToString(),
-                                             expense.TotalExpenses.ToString());
-                        ++counter;
+                        signInOut.CursorForSelect.RenderCursor();
+                        signInOut.CursorForSelect.Move(CursorForSelect.InputData());
+
+                        while (signInOut.IsLogin())
+                        {
+                            try
+                            {
+                                mainScreen.CursorForSelect.RenderCursor();
+                                mainScreen.CursorForSelect.Move(CursorForSelect.InputData());
+                                while (mainScreen.CustomerSettingsScreen.IsSettings)
+                                {
+                                    mainScreen.CustomerSettingsScreen.CursorForSelect.RenderCursor();
+                                    mainScreen.CustomerSettingsScreen.CursorForSelect.Move(CursorForSelect.InputData());
+                                    while (!mainScreen.CustomerSettingsScreen.OperationOverEmployees.IsToBack)
+                                    {
+                                        mainScreen.CustomerSettingsScreen.OperationOverEmployees.CursorForSelect.RenderCursor();
+                                        mainScreen.CustomerSettingsScreen.OperationOverEmployees.CursorForSelect.Move(CursorForSelect.InputData());
+                                    }
+                                    while (!mainScreen.CustomerSettingsScreen.OperationOverGoods.IsToBack)
+                                    {
+                                        mainScreen.CustomerSettingsScreen.OperationOverGoods.CursorForSelect.RenderCursor();
+                                        mainScreen.CustomerSettingsScreen.OperationOverGoods.CursorForSelect.Move(CursorForSelect.InputData());
+                                    }
+                                    while (!mainScreen.CustomerSettingsScreen.OperationOverRentalSpace.IsToBack)
+                                    {
+                                        mainScreen.CustomerSettingsScreen.OperationOverRentalSpace.CursorForSelect.RenderCursor();
+                                        mainScreen.CustomerSettingsScreen.OperationOverRentalSpace.CursorForSelect.Move(CursorForSelect.InputData());
+                                    }
+                                }
+                            }
+                            catch (ValidationException ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                Console.ReadLine();
+                            }
+                            catch (InvalidCastException ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                Console.ReadLine();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                Console.ReadLine();
+                            }
+                        }
                     }
-                }
-
-                counter = 1;
-                foreach (var good in (input.NumberOfMonths == 1 ? myShop.GetGoods() : myShop.Toys))
-                {
-                    tableRevenueFromSales.AddRow(counter.ToString(), good.SalePrice.ToString(), good.Margin.ToString(), good.Count.ToString(), good.TotalRevenueFromSales.ToString());
-                    ++counter;
-                }              
-
-                Console.WriteLine("Затраты");
-                tableExpenses.Print();
-                Console.WriteLine();
-                Console.WriteLine("Доход от продажи товара");
-                tableRevenueFromSales.Print();
-
-                Console.WriteLine($"Доход за {input.NumberOfMonths} {Endings.GetNewWord("месяц", input.NumberOfMonths)}: {revenue}.");
-                Console.WriteLine("Прибыль за это время составила:{0}", delta);
+                    catch(ValidationException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        Console.ReadLine();
+                    }
+                    catch (InvalidCastException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        Console.ReadLine();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        Console.ReadLine();
+                    }
+                }                
             }
+            
             catch (InvalidCastException ex)
             {
                 Console.WriteLine(ex.Message);
-            }
-            catch (MoneyException ex)
-            {
-                Console.WriteLine(ex.Message);
+                Console.ReadLine();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                Console.ReadLine();
             }
 
             Console.ReadLine();
