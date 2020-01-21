@@ -24,8 +24,23 @@ namespace Shop.DAL.Storages
             return storages;                    
         }
 
-        public List<Employees> Employees { get; }
-        public List<Goods> Goods { get; }
-        public List<RentalSpaces> RentalSpaces { get; }
+        public void ClearEmployee()
+        {
+            Employees.Clear();
+        }
+
+        public void ClearGood()
+        {
+            Goods.Clear();
+        }
+
+        public void ClearRentalSpace()
+        {
+            RentalSpaces.Clear();
+        }
+
+        public List<Employees> Employees { get; private set; }
+        public List<Goods> Goods { get; private set; }
+        public List<RentalSpaces> RentalSpaces { get; private set; }
     }
 }

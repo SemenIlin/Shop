@@ -1,7 +1,6 @@
 ﻿using Shop.DAL.Models;
 using Shop.DAL.Interfaces;
 using Shop.DAL.Storages;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,9 +40,9 @@ namespace Shop.DAL.Repositories
             storages.Goods[id] = item;
         }
 
-        public IEnumerable<Goods> Find(Func<Goods, bool> predicate)
+        public void Clear()
         {
-            throw new NotImplementedException();
+            storages.ClearGood();
         }
     }
 }

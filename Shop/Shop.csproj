@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CursorInConsole\CursorInConsole.csproj" />
     <ProjectReference Include="..\EndingsOfTheNouns\EndingsOfTheNouns.csproj" />
-    <ProjectReference Include="..\Shop.BLL\Shop.BLL.csproj" />
-    <ProjectReference Include="..\Shop.DAL\Shop.DAL.csproj" />
+    <ProjectReference Include="..\Exceptions\Exceptions.csproj" />
+    <ProjectReference Include="..\Shop.PL\Shop.PL.csproj" />
   </ItemGroup>
 
 </Project>
