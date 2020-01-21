@@ -56,6 +56,11 @@ namespace Shop
                                 Console.WriteLine(ex.Message);
                                 Console.ReadLine();
                             }
+                            catch(ArgumentOutOfRangeException ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                Console.ReadLine();
+                            }
                             catch (InvalidCastException ex)
                             {
                                 Console.WriteLine(ex.Message);

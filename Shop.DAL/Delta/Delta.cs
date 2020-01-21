@@ -4,6 +4,7 @@ using Shop.DAL.Repositories;
 using Shop.DAL.Revenue;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Shop.DAL
 {
@@ -46,10 +47,17 @@ namespace Shop.DAL
         {
            if (numberOfMonth >= 1)
             {
-                balance = budget - totalConst.GetTotalExpensesForEmployees() - totalConst.GetTotalExpensesForRentalSpace();
+                balance = budget - totalConst.GetTotalExpensesForEmployees() - totalConst.GetTotalExpensesForRentalSpace();                
+               
+                if((good.SalePrice * numbersOfToys > decimal.MaxValue) ||
+                   (balance / good.PurchasePrice > int.MaxValue))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(numbersOfToys), "Невероятно БОЛЬШАЯ прибыль, поделись с разработчиком. Номер карты 1234 **** **** 6789.");
+                }
+
                 numbersOfToys = (int)(balance / good.PurchasePrice);
                 surplus = balance - numbersOfToys * good.PurchasePrice;
-               
+
                 margin = good.SalePrice - good.PurchasePrice;
                 totalRevenueFromSales = good.SalePrice * numbersOfToys;
                 totalExpenceForPurchase = good.PurchasePrice * numbersOfToys;
