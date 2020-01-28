@@ -3,16 +3,22 @@ using Shop.CursoreConsole;
 using Shop.PL;
 using Shop.Settings;
 using Exceptions;
+using Shop.BLL.Infrastructure;
+using Ninject;
+using Shop.BLL;
 
 namespace Shop
 {
     class Program
     {
+        public static IKernel Kernel;
         static void Main()
         {
-            Account account = new Account();
-            SignInOut signInOut = new SignInOut(account);
-            CalculaterOfRevenue calculater = new CalculaterOfRevenue(account);
+            Kernel = new StandardKernel(new CalculateServiceCollection());
+            var calculater = Kernel.Get<UserServiceFromList>();
+
+            var account = new Account();
+            var signInOut = new SignInOut(account, calculater);            
 
             try
             {

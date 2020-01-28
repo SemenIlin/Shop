@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using ShopBLL.Models;
+using Shop.BLL.Models;
 
 namespace Exceptions
 {
@@ -8,7 +8,7 @@ namespace Exceptions
         private readonly string password;
         private readonly string confirmPassword;
         private readonly string login;
-        private readonly UserSignInDTO user;
+        private readonly UserDTO user;
 
         public ValidationUser( string password, string confirmPassword)
         {
@@ -16,7 +16,7 @@ namespace Exceptions
             this.confirmPassword = confirmPassword;
         }
 
-        public ValidationUser(string login, string password, UserSignInDTO user)
+        public ValidationUser(string login, string password, UserDTO user)
         {
             this.user = user;
             this.login = login;

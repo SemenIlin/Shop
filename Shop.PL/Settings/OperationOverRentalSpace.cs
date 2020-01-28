@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Shop.BLL.Infrastructure;
 using Shop.CursoreConsole;
-using Shop.PL;
 
 namespace Shop.Settings
 {
@@ -11,8 +11,8 @@ namespace Shop.Settings
         private readonly NumberStyles style = NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign;
         private readonly CultureInfo culture = CultureInfo.CreateSpecificCulture("en-GB");
 
-        private readonly CalculaterOfRevenue calculater;
-        private readonly CursorForSelect cursor;
+        private readonly UserServiceFromList calculater;
+
         private CursorForSelect insideCursor;
         private Dictionary<string, Action> dictionaryRentalSpace;
 
@@ -21,10 +21,10 @@ namespace Shop.Settings
 
         private bool IsRentalSpace { get; set; }
 
-        public OperationOverRentalSpace(CalculaterOfRevenue calculater)
+        public OperationOverRentalSpace(UserServiceFromList calculater)
         {
             this.calculater = calculater;
-            cursor = new CursorForSelect(new Dictionary<string, Action>()
+            CursorForSelect = new CursorForSelect(new Dictionary<string, Action>()
             {
                 { "Добавить помещение.", CreateRentalSpace },
                 { "Редактировать помещение.", UpdateRentalSpace },
@@ -35,7 +35,7 @@ namespace Shop.Settings
             IsToBack = true;
         }
 
-        public CursorForSelect CursorForSelect { get { return cursor; } }
+        public CursorForSelect CursorForSelect { get; private set; }
 
         public bool IsToBack { get; set; }
 
@@ -105,7 +105,7 @@ namespace Shop.Settings
         private Dictionary<string, Action> CreateDictionaryRentalSpace()
         {
             dictionaryRentalSpace = new Dictionary<string, Action>();
-            foreach (var item in calculater.GetRentalSpace())
+            foreach (var item in calculater.GetRentalSpaces())
             {
                 dictionaryRentalSpace.Add($"{item.Title}: {item.Rental}", ToBackRentalSpace);
             }

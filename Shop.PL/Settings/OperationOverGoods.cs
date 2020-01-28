@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Shop.BLL.Infrastructure;
 using Shop.CursoreConsole;
-using Shop.PL;
+
 namespace Shop.Settings
 {
     public class OperationOverGoods
@@ -10,8 +11,7 @@ namespace Shop.Settings
         private readonly NumberStyles style = NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign;
         private readonly CultureInfo culture = CultureInfo.CreateSpecificCulture("en-GB");
 
-        private readonly CalculaterOfRevenue calculater;
-        private readonly CursorForSelect cursor; 
+        private readonly UserServiceFromList calculater;
         private CursorForSelect insideCursor;
         private Dictionary<string, Action> dictionaryGoods;
         
@@ -22,10 +22,10 @@ namespace Shop.Settings
 
         private bool IsGoods { get; set; }
 
-        public OperationOverGoods(CalculaterOfRevenue calculater)
+        public OperationOverGoods(UserServiceFromList calculater)
         {
             this.calculater = calculater;
-            cursor = new CursorForSelect(new System.Collections.Generic.Dictionary<string, Action>()
+            CursorForSelect = new CursorForSelect(new Dictionary<string, Action>()
             {
                 {"Добавить товар.", CreateGood },
                 {"Редактировать товар.", UpdateGood },
@@ -36,7 +36,7 @@ namespace Shop.Settings
             IsToBack = true;
         }
 
-        public CursorForSelect CursorForSelect { get { return cursor; } }
+        public CursorForSelect CursorForSelect { get; private set; }
 
         public bool IsToBack { get; set; }
 

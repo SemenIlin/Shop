@@ -9,14 +9,13 @@ namespace Shop.DAL.Repositories
         private IRepository<Goods> goods;
         private IRepository<RentalSpaces> rentalSpace;
 
-        
         public IRepository<Employees> Employees
         {
             get
             {
                 if(employees == null)
                 {
-                    employees = new RepositoryOfEmployees();
+                    employees = new RepositoryOfEmployeesList();
                 }
 
                 return employees;
@@ -29,7 +28,7 @@ namespace Shop.DAL.Repositories
             {
                 if(goods == null)
                 {
-                    goods = new RepositoryOfGoods();
+                    goods = new RepositoryOfGoodsList();
                 }
 
                 return goods;
@@ -42,7 +41,7 @@ namespace Shop.DAL.Repositories
             {
                 if (rentalSpace == null)
                 {
-                    rentalSpace = new RepositoryOfRentalSpace();                
+                    rentalSpace = new RepositoryOfRentalSpaceList();                
                 }
 
                 return rentalSpace;

@@ -1,22 +1,27 @@
 ﻿using System;
 using Shop.PL.Models;
-using Shop.PL;
 using System.Collections.Generic;
 using Shop.CursoreConsole;
+using Shop.BLL.Models;
+using Shop.BLL.Interfaces;
+using Shop.BLL.Infrastructure;
 
-namespace Shop
+namespace Shop.PL
 {
     public class SignInOut
     {        
         private readonly Dictionary<string, Action> action;
-        private readonly Account account;
+        private readonly IAccount<UserDTO,RegistrationDTO,SignInDTO> account;
+        private readonly UserServiceFromList userService;
+
         private string login;
         private string password;
         private string confirmPassword;
 
-        public SignInOut(Account account)
+        public SignInOut(IAccount<UserDTO, RegistrationDTO, SignInDTO> account, UserServiceFromList userService)
         {
             this.account = account;
+            this.userService = userService;
 
             action = new Dictionary<string, Action>(){
                 { "Войти в систему", SignIn},
@@ -36,7 +41,7 @@ namespace Shop
             SetPassword();
 
             SignInModel = new SignInModel(login, password);
-            account.SignInUser(SignInModel);           
+            account.SignInUser( new SignInDTO {Login = SignInModel.Login, Password = SignInModel.Password });           
         }
 
         public bool IsLogin()
@@ -51,7 +56,11 @@ namespace Shop
             SetConfirmPassword();
 
             RegistrationModel = new RegistrationModel(login, password, confirmPassword);
-            account.RegistrationUser(RegistrationModel);
+            account.RegistrationUser(new RegistrationDTO {
+                Login = RegistrationModel.Login, 
+                Password = RegistrationModel.Password, 
+                ConfirmPassword = RegistrationModel.ConfirmPassword
+            });
             account.CreateRecord();
         }
 
@@ -60,17 +69,31 @@ namespace Shop
             account.ExitFromAccount();
         }
 
+        public void ToFillUser(int month, decimal budget)
+        {
+            account.User.Employees = userService.GetEmployees();
+            account.User.Goods = userService.GetGoods();
+            account.User.RentalSpaces = userService.GetRentalSpaces();
+            account.User.TotalRevenue = userService.AnalyticsOfShop.Revenue * month;
+            account.User.TotalExpenses = userService.AnalyticsOfShop.TotalExpenses * month; 
+            account.User.Delta = userService.Delta.DeltaFromShop;
+            account.User.Budget = budget;
+            account.User.Month = month;
+
+            account.CreateRecord();
+        }
+
         public void ViewPreviousEntry()
         {
             var records = account.GetRecords();
-
-            Console.WriteLine($"Начальный бюджет: {records.Budget}.");
-
+            Console.WriteLine($"Начальный бюджет {records.Budget}.");
             if (records.Employees != null)
             {
                 foreach (var employee in records.Employees)
                 {
-                    Console.WriteLine($"Должность: {employee.Position}, зарплата: {employee.Salary}.");
+                    Console.WriteLine($"Должность: {employee.Position}, " +
+                        $"зарплата за {records.Month} {EndingsOfTheNouns.Endings.GetNewWord("месяц", records.Month)}:" +
+                        $" {employee.Salary * records.Month}.");
                 }
             }
             if (records.Goods != null)
@@ -85,11 +108,11 @@ namespace Shop
             {
                 foreach (var rentalSpace in records.RentalSpaces)
                 {
-                    Console.WriteLine($"Название помещения: {rentalSpace.Title}, аренда: {rentalSpace.Rental}.");
+                    Console.WriteLine($"Название помещения: {rentalSpace.Title}, аренда" +
+                        $" за {records.Month} {EndingsOfTheNouns.Endings.GetNewWord("месяц", records.Month)}: {rentalSpace.Rental * records.Month}.");
                 }
             }
-
-            Console.WriteLine($"Количество месяцев {records.Month}");
+            Console.WriteLine($"Количество месяцев {records.Month}.");
             Console.WriteLine($"Доход  {records.TotalRevenue} расход {records.TotalExpenses} прибыль {records.Delta}");
         }
 

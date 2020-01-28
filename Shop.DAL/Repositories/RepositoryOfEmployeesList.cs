@@ -1,48 +1,47 @@
 ﻿using Shop.DAL.Models;
 using Shop.DAL.Interfaces;
-using Shop.DAL.Storages;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Shop.DAL.Repositories
 {
-    public class RepositoryOfEmployees : IRepository<Employees>
+    public class RepositoryOfEmployeesList : IRepository<Employees>        
     {
-        private readonly Storage storages;
-
-        public RepositoryOfEmployees()
+        private readonly List<Employees> employees;
+        
+        public RepositoryOfEmployeesList()
         {
-            storages = Storage.GetStorages();
+            employees = new List<Employees>();
         }
 
         public void Create(Employees item)
         {
-            storages.Employees.Add(item);
+            employees.Add(item);
         }
 
         public void Delete(int id)
         {
-            storages.Employees.RemoveAt(id);
+            employees.RemoveAt(id);
         }
 
         public Employees Get(int id)
         {
-            return storages.Employees[id];
+            return employees[id];
         }
 
         public IEnumerable<Employees> GetAll()
         {
-            return storages.Employees.ToList();
+            return employees.ToList();
         }
 
         public void Update(Employees item, int id)
         {
-            storages.Employees[id] = item;
+            employees[id] = item;
         }
 
         public void Clear()
         {
-            storages.ClearEmployee();
+            employees.Clear();
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Shop.DAL.Storages
 {
-    public class Storage
+    public class Storage 
     {
         private static Storage storages;
 

@@ -1,48 +1,47 @@
 ﻿using Shop.DAL.Models;
 using Shop.DAL.Interfaces;
-using Shop.DAL.Storages;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Shop.DAL.Repositories
 {
-    public class RepositoryOfGoods : IRepository<Goods>
+    public class RepositoryOfGoodsList : IRepository<Goods>
     {
-        private readonly Storage storages;
+        private readonly List<Goods> goods;
 
-        public RepositoryOfGoods()
+        public RepositoryOfGoodsList()
         {
-            storages = Storage.GetStorages();
+            goods = new List<Goods>();
         }
 
         public void Create(Goods item)
         {
-            storages.Goods.Add(item);
+            goods.Add(item);
         }
 
         public void Delete(int id)
         {
-            storages.Goods.RemoveAt(id);
+            goods.RemoveAt(id);
         }
 
         public Goods Get(int id)
         {
-            return storages.Goods[id];
+            return goods[id];
         }
 
         public IEnumerable<Goods> GetAll()
         {
-            return storages.Goods.ToList();
+            return goods.ToList();
         }
 
         public void Update(Goods item, int id)
-        { 
-            storages.Goods[id] = item;
+        {
+            goods[id] = item;
         }
 
         public void Clear()
         {
-            storages.ClearGood();
+            goods.Clear();
         }
     }
 }

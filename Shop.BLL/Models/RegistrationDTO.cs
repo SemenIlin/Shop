@@ -1,6 +1,6 @@
-﻿namespace ShopBLL.Models
+﻿namespace Shop.BLL.Models
 {
-    public class UserRegistrationDTO
+    public class RegistrationDTO
     {
         public string Login { get; set; }
 

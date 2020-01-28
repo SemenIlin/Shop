@@ -1,16 +1,18 @@
-﻿using EndingsOfTheNouns;
-using Shop.PL;
+﻿using Shop.BLL.Infrastructure;
 using System;
 using System.Globalization;
-using System.Linq;
 
-namespace Shop.Settings
+namespace Shop.PL.Settings
 {
     public class CalculateRevenueDefault
     {
         private readonly NumberStyles style = NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign;
         private readonly CultureInfo culture = CultureInfo.CreateSpecificCulture("en-GB");
-        private readonly CalculaterOfRevenue calculater;
+
+        private readonly UserServiceFromList calculater;
+
+        private DrawTable draw;
+        private ToFillUser toFill;             
 
         private decimal budget;
         private decimal bubgetDublicat;
@@ -28,9 +30,22 @@ namespace Shop.Settings
 
         private decimal valueRentalSpace;
 
-        public CalculateRevenueDefault(CalculaterOfRevenue calculater)
+        public CalculateRevenueDefault(UserServiceFromList calculater)
         {
             this.calculater = calculater;
+        }
+
+        public delegate void DrawTable(int month);
+        public delegate void ToFillUser(int month, decimal budget);
+
+        public void RegisterHandlerDrawTable(DrawTable draw)
+        {
+            this.draw = draw;
+        }
+
+        public void RegisterHandlerToFillUser(ToFillUser toFill)
+        {
+            this.toFill = toFill;
         }
 
         public void Calculate()
@@ -42,8 +57,9 @@ namespace Shop.Settings
             CalculateCountToys();
             SetToyPriceSale();
             SetNumberOfMonths();
-            calculater.CalculateRevenue(bubgetDublicat, month);
-            OutputDataInTables(month);
+            calculater.CalculateRevenue(month);
+            toFill?.Invoke(month, bubgetDublicat);
+            draw?.Invoke(month);
 
             calculater.Clear();
             Console.ReadLine();
@@ -135,54 +151,6 @@ namespace Shop.Settings
             Console.WriteLine("Введите количество месяцев для расчёта.");
             int.TryParse(Console.ReadLine(), out month);
         }
-
-        private void OutputDataInTables(int month)
-        {
-            var tableExpenses = new ConsoleTable("№", "Аренда", "Зарплата", "Закупка", "Итого");
-            var tableRevenueFromSales = new ConsoleTable("№", "Цена продажи", "Наценка", "Количество", "Итого с продаж");
-
-            int counter = 1;
-
-            if (month == 1)
-            {
-                tableExpenses.AddRow("1", calculater.TotalConst.GetTotalExpensesForRentalSpace().ToString(),
-                                     calculater.TotalConst.GetTotalExpensesForEmployees().ToString(),
-                                     calculater.TotalVariable.GetTotalExpensesForGoods().ToString(),
-                                     calculater.TotalExpenses.GetExpenses().ToString());
-            }
-            else
-            {
-                foreach (var expense in calculater.Expenses)
-                {
-                    tableExpenses.AddRow(counter.ToString(),
-                                         expense.TotalRentalSpace.ToString(),
-                                         expense.TotalSalary.ToString(),
-                                         expense.TotalPurchasePriceOfGood.ToString(),
-                                         expense.TotalExpenses.ToString());
-                    ++counter;
-                }
-            }
-
-            counter = 1;
-            foreach (var good in (month == 1 ? calculater.GetGoods() : calculater.Toys))
-            {
-                tableRevenueFromSales.AddRow(counter.ToString(), good.SalePrice.ToString(), good.Margin.ToString(), good.Count.ToString(), good.TotalRevenueFromSales.ToString());
-                ++counter;
-            }
-
-            Console.WriteLine("Затраты");
-            tableExpenses.Print();
-            Console.WriteLine();
-            Console.WriteLine("Доход от продажи товара");
-            tableRevenueFromSales.Print();
-
-            Console.WriteLine($"Доход {calculater.Toys.Sum(t => t.TotalRevenueFromSales)} Расход {calculater.Expenses.Sum(e => e.TotalExpenses)}");
-            Console.WriteLine($"Прибыль за {month} {Endings.GetNewWord("месяц", month)} составила:{calculater.Delta.DeltaFromShop}");
-
-            calculater.Clear();
-            calculater.Toys.Clear();
-            calculater.Expenses.Clear();
-            Console.ReadLine();
-        }
+        
     }
 }

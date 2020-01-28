@@ -1,20 +1,21 @@
 ﻿using RecordInJsonFile;
-using Shop.PL.Models;
-using ShopBLL.Models;
+using Shop.BLL.Interfaces;
+using Shop.BLL.Models;
 
-namespace Shop.PL
+namespace Shop.BLL.Infrastructure
 {
-    public class Account
+    public class Account : IAccount<UserDTO,RegistrationDTO, SignInDTO>
     {
+
         private string login;
 
-        public UserSignInDTO UserSignInDTO { get; private set; }
+        public UserDTO User { get; private set; }
 
         public bool IsLogin { get; private set; }
 
-        public void RegistrationUser(RegistrationModel registration)
+        public void RegistrationUser(RegistrationDTO registration)
         {
-            UserSignInDTO = new UserSignInDTO
+            User = new UserDTO
             {
                 Login = registration.Login,
                 Password = registration.Password
@@ -25,9 +26,9 @@ namespace Shop.PL
             IsLogin = true;
         }
 
-        public void SignInUser(SignInModel signIn)
+        public void SignInUser(SignInDTO signIn)
         {
-            UserSignInDTO = new UserSignInDTO
+            User = new UserDTO
             {
                 Login = signIn.Login,
                 Password = signIn.Password
@@ -40,13 +41,13 @@ namespace Shop.PL
 
         public void CreateRecord()
         {
-            var directory = new DirectoryForJson<UserSignInDTO>(UserSignInDTO.Login, UserSignInDTO, false);
+            var directory = new DirectoryForJson<UserDTO>(User.Login, User, false);
             directory.WriteInDerictory();
         }
 
-        public UserSignInDTO GetRecords()
+        public UserDTO GetRecords()
         {
-            return DirectoryForJson<UserSignInDTO>.ReadJson(login + "\\" + login + ".json");
+            return DirectoryForJson<UserDTO>.ReadJson(login + "\\" + login + ".json");
         }
 
         public void ExitFromAccount()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Shop.BLL.Infrastructure;
 using Shop.CursoreConsole;
 using Shop.PL;
 
@@ -13,8 +14,7 @@ namespace Shop.Settings
 
         private Dictionary<string, Action> dictionaryEmployees;
 
-        private readonly CalculaterOfRevenue calculater;
-        private readonly CursorForSelect cursor;
+        private readonly UserServiceFromList calculater;
         private CursorForSelect insideCursor;
 
         private decimal salary = 0;
@@ -22,11 +22,11 @@ namespace Shop.Settings
 
         private bool IsEmployee { get; set; }
 
-        public OperationOverEmployees(CalculaterOfRevenue calculater)
+        public OperationOverEmployees(UserServiceFromList calculater)
         {
             this.calculater = calculater;
 
-            cursor = new CursorForSelect(new Dictionary<string, Action>()
+            CursorForSelect = new CursorForSelect(new Dictionary<string, Action>()
             {
                 {"Добавить работника.", CreateEmployee },
                 { "Редактировать работника.", UpdateEmployee },
@@ -37,7 +37,7 @@ namespace Shop.Settings
             IsToBack = true;
         }
 
-        public CursorForSelect CursorForSelect { get { return cursor; } }
+        public CursorForSelect CursorForSelect { get; private set; }
 
         public bool IsToBack { get; set; }
 

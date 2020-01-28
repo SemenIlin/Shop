@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using RecordInJsonFile;
 using Exceptions;
-using ShopBLL.Models;
+using Shop.BLL.Models;
 
 namespace Shop.PL.Models
 {
@@ -11,7 +11,7 @@ namespace Shop.PL.Models
         {
             if (Directory.Exists(login))
             {
-                ValidationUser validation = new ValidationUser(login, password, DirectoryForJson<UserSignInDTO>.ReadJson(login + "\\" + login + ".json"));
+                ValidationUser validation = new ValidationUser(login, password, DirectoryForJson<UserDTO>.ReadJson(login + "\\" + login + ".json"));
                 validation.CheckExistUser();
 
                 Login = login;

@@ -2,14 +2,8 @@
 {
     public class Goods
     {
-        private static int id = 1;
-        public Goods()
-        {
-            Id = id;
-            ++id;
-        }
 
-        public int Id { get; private set; }
+        public int Id { get; set; }
 
         public decimal PurchasePrice { get; set; }
         public decimal SalePrice { get; set; }
